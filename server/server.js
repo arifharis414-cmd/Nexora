@@ -13,15 +13,16 @@ dotenv.config();
 import connectDB from "./config/db.js";
 import app from "./app.js";
 
-const PORT = process.env.PORT || 5000;
+const PORT = Number(process.env.PORT) || 5000;
+const HOST = process.env.HOST || "0.0.0.0";
 
 // IMPORTANT: start listening on the port immediately, independent of MongoDB.
 // This is the fix for "backend not running" — previously app.listen() only
 // ran inside connectDB().then(), so if Mongo failed or hung, the server
 // never bound to the port at all, and the frontend had nothing to reach.
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-  console.log(`   Try it: http://localhost:${PORT}/api/health`);
+app.listen(PORT, HOST, () => {
+  console.log(`🚀 Server running on http://${HOST}:${PORT}`);
+  console.log(`   Try it: http://${HOST}:${PORT}/api/health`);
 });
 
 connectDB();

@@ -1,10 +1,17 @@
 import mongoose from "mongoose";
 
 const connectDB = async () => {
+  const mongoUri = process.env.MONGO_URI;
+
+  if (!mongoUri) {
+    console.error("❌ MONGO_URI is not set. Add it in Railway Variables to connect to MongoDB.");
+    return false;
+  }
+
   try {
     // serverSelectionTimeoutMS: fail fast (10s) instead of hanging forever
     // if DNS/network/credentials/IP-allowlist are wrong.
-    const conn = await mongoose.connect(process.env.MONGO_URI, {
+    const conn = await mongoose.connect(mongoUri, {
       serverSelectionTimeoutMS: 10000,
     });
     console.log(`✅ MongoDB connected: ${conn.connection.host}`);
@@ -16,10 +23,6 @@ const connectDB = async () => {
       "3) the cluster isn't paused  4) your network allows outbound DNS/TCP to MongoDB Atlas."
     );
     return false;
-    // NOTE: we intentionally do NOT call process.exit() here.
-    // Killing the process on a DB error means the whole API disappears,
-    // which is exactly the "backend not running" symptom you were seeing.
-    // Better to keep the server up so you get real error messages instead of silence.
   }
 };
 
