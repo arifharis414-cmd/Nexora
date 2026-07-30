@@ -1,11 +1,15 @@
 import dotenv from "dotenv";
-dotenv.config();
+import mongoose from "mongoose";
 import connectDB from "../config/db.js";
 import Category from "../models/Category.js";
 import Product from "../models/Product.js";
 import User from "../models/User.js";
 
-const slugify = (str) => str.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+// Load configuration keys from environmental variables safely
+dotenv.config();
+
+const slugify = (str) => 
+  str.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 
 const categoryData = [
   { name: "Watches", description: "Classic and smart watches" },
@@ -45,7 +49,7 @@ const productsByCategory = {
   "Home & Kitchen": [
     ["Stainless Steel Blender", 45.0, 10, "https://images.unsplash.com/photo-1570222094114-d054a817e56b?auto=format&fit=crop&w=900&q=80"],
     ["Non-stick Cookware Set", 89.0, 0, "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=900&q=80"],
-    ["Electric Kettle", 24.99, 15, "https://loremflickr.com/900/900/electric,kettle"],
+    ["Electric Kettle", 24.99, 15, "https://images.unsplash.com/photo-1585515320310-259814833e62?auto=format&fit=crop&w=900&q=80"],
     ["Air Fryer Compact", 69.99, 10, "https://images.unsplash.com/photo-1585515320310-259814833e62?auto=format&fit=crop&w=900&q=80"],
     ["Ceramic Dinner Set", 55.0, 5, "https://images.unsplash.com/photo-1603199506016-b9a594b593c0?auto=format&fit=crop&w=900&q=80"],
     ["Bamboo Storage Organizer", 32.0, 10, "https://images.unsplash.com/photo-1595428774223-ef52624120d2?auto=format&fit=crop&w=900&q=80"],
@@ -54,19 +58,31 @@ const productsByCategory = {
 };
 
 const run = async () => {
-  await connectDB();
-  console.log("Clearing old data...");
-  await Promise.all([Category.deleteMany(), Product.deleteMany(), User.deleteMany({ role: "admin" })]);
+  // Prevent execution if the connection URI hasn't been set up correctly
+  if (!process.env.MONGO_URI) {
+    console.error("❌ CRITICAL: Seeding terminated. MONGO_URI is missing.");
+    process.exit(1);
+  }
 
-  console.log("Seeding categories...");
+  console.log("⏳ Connecting to the database...");
+  await connectDB();
+  
+  console.log("🧹 Clearing old data...");
+  await Category.deleteMany();
+  await Product.deleteMany();
+  await User.deleteMany({ role: "admin" });
+
+  console.log("🌱 Seeding categories...");
   const categories = await Category.insertMany(
     categoryData.map((c) => ({ ...c, slug: slugify(c.name) }))
   );
 
-  console.log("Seeding products...");
+  console.log("📦 Seeding products...");
   const products = [];
   for (const cat of categories) {
     const list = productsByCategory[cat.name];
+    if (!list) continue;
+    
     list.forEach(([name, price, discountPercent, image], idx) => {
       products.push({
         name,
@@ -83,7 +99,7 @@ const run = async () => {
   }
   await Product.insertMany(products);
 
-  console.log("Seeding admin user (email: admin@example.com / password: admin123)...");
+  console.log("👤 Seeding admin user (email: admin@example.com)...");
   await User.create({
     name: "Admin",
     email: "admin@example.com",
@@ -91,11 +107,17 @@ const run = async () => {
     role: "admin",
   });
 
-  console.log("Seeding complete!");
+  console.log("✅ Seeding complete! Closing connections...");
+  await mongoose.connection.close();
   process.exit(0);
 };
 
-run().catch((err) => {
-  console.error(err);
+run().catch(async (err) => {
+  console.error("❌ Seeding failed with error:", err.message);
+  try {
+    await mongoose.connection.close();
+  } catch (closeErr) {
+    console.error("Failed to safely close connection:", closeErr.message);
+  }
   process.exit(1);
 });
