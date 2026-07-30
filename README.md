@@ -62,7 +62,7 @@ Before running the project, make sure you have:
 3. Update the values in .env:
    ```env
    PORT=5000
-   MONGO_URI=mongodb://localhost:27017/mern_ecommerce
+   MONGO_URI=mongodb://localhost:27017/shopli
    JWT_SECRET=your_super_secret_key
    JWT_EXPIRES_IN=30d
    NODE_ENV=development
