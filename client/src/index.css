@@ -1,0 +1,152 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+/* -------------------------------------------------
+   Design tokens — our color palette & fonts from Phase 1
+   Using CSS variables so we can reuse them anywhere,
+   and reference them inside Tailwind via arbitrary values e.g. bg-[var(--color-bg)]
+-------------------------------------------------- */
+:root {
+  --color-text: #132238;
+  --color-bg: #f4f7f8;
+  --color-bg-soft: #e9f0f2;
+  --color-primary: #ef6a52;
+  --color-primary-dark: #d9503d;
+  --color-success: #16806b;
+  --color-danger: #d9474d;
+  --color-navy: #071a2c;
+  --color-navy-light: #0d2a42;
+  --color-cyan: #7de3d0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  color: var(--color-text);
+  background: var(--color-bg);
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, .brand-wordmark {
+  font-family: 'Space Grotesk', 'DM Sans', sans-serif;
+}
+
+.brand-symbol {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-style: italic;
+  font-size: 1.35rem;
+}
+
+button, a, input {
+  transition: color 180ms ease, background-color 180ms ease, border-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 18px 40px rgba(7, 26, 44, 0.08);
+}
+
+.page-transition {
+  animation: page-transition 220ms ease both;
+}
+
+.page-transition.exit {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.page-transition.enter {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.magnetic-button {
+  will-change: transform;
+}
+
+.cart-fly-ghost {
+  position: fixed;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: radial-gradient(circle at top left, rgba(125, 227, 208, 0.95), rgba(239, 106, 82, 0.95));
+  z-index: 9999;
+  pointer-events: none;
+  box-shadow: 0 12px 26px rgba(7, 26, 44, 0.2);
+  transition: transform 500ms cubic-bezier(0.22, 1, 0.36, 1), opacity 500ms ease;
+}
+
+.skeleton-shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton-shine::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+  animation: shimmer 1.2s infinite;
+}
+
+.hero-grid {
+  background-image: linear-gradient(rgba(125, 227, 208, 0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(125, 227, 208, 0.06) 1px, transparent 1px);
+  background-size: 38px 38px;
+}
+
+.reveal-up {
+  animation: reveal-up 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.interactive-lift {
+  transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 280ms ease, border-color 280ms ease;
+  animation: surface-in 650ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.interactive-lift:hover {
+  transform: translateY(-6px) scale(1.012);
+  box-shadow: 0 20px 44px rgba(7, 26, 44, 0.16);
+}
+
+.interactive-button {
+  transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 220ms ease, background-color 180ms ease;
+}
+
+.interactive-button:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 12px 24px rgba(7, 26, 44, 0.18);
+}
+
+.interactive-button:active {
+  transform: translateY(0) scale(0.98);
+}
+
+@keyframes surface-in {
+  from { opacity: 0; transform: translateY(14px) scale(0.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes reveal-up {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
+}
+
+@keyframes page-transition {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
